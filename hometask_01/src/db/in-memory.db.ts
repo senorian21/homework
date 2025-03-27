@@ -10,7 +10,7 @@ export const db = {
       minAgeRestriction: null,
       createdAt: new Date(),
       publicationDate: new Date(),
-      availableResolutions: Resolutions.P1440,
+      availableResolutions: [Resolutions.P1440],
     },
     {
       id: 1,
@@ -20,7 +20,7 @@ export const db = {
       minAgeRestriction: 12,
       createdAt: new Date(),
       publicationDate: new Date(),
-      availableResolutions: Resolutions.P720,
+      availableResolutions: [Resolutions.P720],
     },
     {
       id: 2,
@@ -30,7 +30,7 @@ export const db = {
       minAgeRestriction: 12,
       createdAt: new Date(),
       publicationDate: new Date(),
-      availableResolutions: Resolutions.P2160,
+      availableResolutions: [Resolutions.P2160],
     },
   ],
 };

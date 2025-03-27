@@ -27,13 +27,13 @@ export const setupApp = (app: Express) => {
   });
 
   app.delete("/videos/:id", (req: Request, res: Response) => {
-    db.videos.splice(+req.params.id, 1);
-    res.send(HttpStatus.NoContent);
+    db.videos = db.videos.filter((v) => v.id === +req.params.id);
+    res.sendStatus(HttpStatus.NoContent);
   });
 
   app.delete("/testing/all-data", (req: Request, res: Response) => {
     db.videos = [];
-    res.send(HttpStatus.NoContent);
+    res.sendStatus(HttpStatus.NoContent);
   });
 
   app.post("/videos", (req: Request, res: Response) => {
@@ -51,7 +51,7 @@ export const setupApp = (app: Express) => {
       minAgeRestriction: null,
       createdAt: createdAt,
       publicationDate: publicationDate,
-      availableResolutions: req.body.resolutions,
+      availableResolutions: req.body.availableResolutions,
     };
 
     db.videos.push(newVideo);
@@ -61,12 +61,10 @@ export const setupApp = (app: Express) => {
 
   app.put("/videos/:id", (req: Request, res: Response) => {
     let video = db.videos.find((v) => v.id === +req.params.id);
-
     if (!video) {
       res.status(404).send({ error: "Video not found" });
-      return; // Возвращаем ошибку, если ID не существует
+      return;
     }
-
     const updateVideo: Video = {
       id: video.id,
       title: req.body.title,
@@ -75,11 +73,12 @@ export const setupApp = (app: Express) => {
       minAgeRestriction: req.body.minAgeRestriction,
       createdAt: video.createdAt,
       publicationDate: req.body.publicationDate,
-      availableResolutions: req.body.resolutions,
+      availableResolutions: req.body.availableResolutions,
     };
-    db.videos = db.videos.map((v) => (v.id === +req.params.id ? updateVideo : v));
-    res.send(HttpStatus.NoContent)
+    db.videos = db.videos.map(v => v.id === +req.params.id ? updateVideo : v );
+    res.sendStatus(HttpStatus.NoContent);
   });
+
 
   return app;
 };

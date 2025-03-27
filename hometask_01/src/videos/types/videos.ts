@@ -16,7 +16,7 @@ export type Video = {
   minAgeRestriction: number | null;
   createdAt: Date;
   publicationDate: Date;
-  availableResolutions: Resolutions;
+  availableResolutions: Resolutions[];
 };
 
 export type Videos = Video[];
