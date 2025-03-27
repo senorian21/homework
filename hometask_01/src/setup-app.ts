@@ -27,7 +27,7 @@ export const setupApp = (app: Express) => {
   });
 
   app.delete("/videos/:id", (req: Request, res: Response) => {
-    db.videos = db.videos.filter((v) => v.id === +req.params.id);
+    db.videos = db.videos.filter((v) => v.id !== +req.params.id);
     res.sendStatus(HttpStatus.NoContent);
   });
 
