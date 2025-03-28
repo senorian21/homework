@@ -97,7 +97,7 @@ describe("Videos API", () => {
       ],
       canBeDownloaded: true,
       minAgeRestriction: 18,
-      publicationDate: date,
+      publicationDate: date.toISOString(),
     };
 
     // Обновить видео
