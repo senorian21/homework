@@ -1,6 +1,11 @@
 import express, { Express, Request, Response } from "express";
 import { db } from "./db/in-memory.db";
 import { HttpStatus } from "./core/types/http-statuses";
+
+import { videoInputValidation } from "./videos/validation/videoInputValidation";
+import { videoUpdateValidation } from "./videos/validation/videoUpdateValidation";
+import { createErrorMessages } from "./core/utils/error.utils";
+
 import { Videos, Resolutions, Video } from "./videos/types/videos";
 
 export const setupApp = (app: Express) => {
@@ -22,11 +27,28 @@ export const setupApp = (app: Express) => {
       Pragma: "no-cache", // Совместимость с HTTP/1.0
       Expires: "0", // Устаревший, но иногда полезный заголовок
     });
-    const searchVideo = db.videos.find((v) => v.id === +req.params.id);
+    let id = +req.params.id;
+    const searchVideo = db.videos.find((v) => v.id === id);
+
+    if (!searchVideo) {
+      res.status(HttpStatus.NotFound).send(
+        createErrorMessages([
+          {
+            field: "id",
+            message: "Videos not found",
+          },
+        ]),
+      );
+    }
+
     res.status(HttpStatus.Ok).send(searchVideo);
   });
 
   app.delete("/videos/:id", (req: Request, res: Response) => {
+    const deletedVideo = db.videos.find((v) => v.id === +req.params.id);
+    if (!deletedVideo) {
+      res.send(HttpStatus.NotFound);
+    }
     db.videos = db.videos.filter((v) => v.id !== +req.params.id);
     res.sendStatus(HttpStatus.NoContent);
   });
@@ -37,9 +59,18 @@ export const setupApp = (app: Express) => {
   });
 
   app.post("/videos", (req: Request, res: Response) => {
-    const createdAt = new Date();
-    const publicationDate = new Date(createdAt);
-    publicationDate.setDate(publicationDate.getDate() + 1);
+    const errors = videoInputValidation(req.body);
+
+    if (errors.length > 0) {
+      res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
+      return;
+    }
+
+    const date = new Date();
+    const createdAt = date.toISOString();
+    const date2 = new Date(createdAt);
+    date2.setDate(date2.getDate() + 1);
+    const publicationDate = date2.toISOString();
     const newId =
       db.videos.length > 0 ? db.videos[db.videos.length - 1].id + 1 : 0;
 
@@ -60,11 +91,21 @@ export const setupApp = (app: Express) => {
   });
 
   app.put("/videos/:id", (req: Request, res: Response) => {
-    let video = db.videos.find((v) => v.id === +req.params.id);
-    if (!video) {
-      res.status(404).send({ error: "Video not found" });
+    const errors = videoUpdateValidation(req.body);
+
+    if (errors.length > 0) {
+      res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
       return;
     }
+
+    let video = db.videos.find((v) => v.id === +req.params.id);
+    if (!video) {
+      res.status(HttpStatus.NotFound).send({ error: "Video not found" });
+      return;
+    }
+
+    const publicationDate = new Date(req.body.publicationDate).toISOString()
+
     const updateVideo: Video = {
       id: video.id,
       title: req.body.title,
@@ -72,13 +113,14 @@ export const setupApp = (app: Express) => {
       canBeDownloaded: req.body.canBeDownloaded,
       minAgeRestriction: req.body.minAgeRestriction,
       createdAt: video.createdAt,
-      publicationDate: req.body.publicationDate,
+      publicationDate: publicationDate,
       availableResolutions: req.body.availableResolutions,
     };
-    db.videos = db.videos.map(v => v.id === +req.params.id ? updateVideo : v );
+    db.videos = db.videos.map((v) =>
+      v.id === +req.params.id ? updateVideo : v,
+    );
     res.sendStatus(HttpStatus.NoContent);
   });
-
 
   return app;
 };
