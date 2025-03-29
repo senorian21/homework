@@ -6,8 +6,13 @@ import { HttpStatus } from "../../src/core/types/http-statuses";
 import { Resolutions } from "../../src/videos/types/videos";
 import { db } from "../../src/db/in-memory.db";
 import { UpdateVideoInputModel } from "../../src/videos/dto/videos.update-dto";
+import express from "express";
+import { setupApp } from "../../src/setup-app";
 
 describe("Videos API", () => {
+  const app = express();
+  setupApp(app);
+
   const testVideosData: CreateVideoInputModel = {
     title: "Top mem cats",
     author: "senorian2",

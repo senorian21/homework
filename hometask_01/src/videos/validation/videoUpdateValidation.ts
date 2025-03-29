@@ -10,7 +10,8 @@ export const videoUpdateValidation = (
   if (
     !data.title ||
     typeof data.title !== "string" ||
-    data.title.trim().length > 40
+    data.title.trim().length > 40 ||
+      data.title.trim().length === 0
   ) {
     errors.push({ field: "title", message: "Invalid title" });
   }
@@ -18,7 +19,8 @@ export const videoUpdateValidation = (
   if (
     !data.author ||
     typeof data.author !== "string" ||
-    data.author.trim().length > 20
+    data.author.trim().length > 20 ||
+      data.author.trim().length === 0
   ) {
     errors.push({ field: "author", message: "Invalid author" });
   }
@@ -28,17 +30,14 @@ export const videoUpdateValidation = (
       field: "Resolutions",
       message: "Resolutions must be array",
     });
-  } else if (data.availableResolutions.length) {
+  } else if (data.availableResolutions.length === 0) {
+    errors.push({
+      field: "Resolutions",
+      message: "Resolutions cannot be empty",
+    });
+  } else {
     const existingResolutions = Object.values(Resolutions);
-    if (
-      data.availableResolutions.length > existingResolutions.length ||
-      data.availableResolutions.length < 1
-    ) {
-      errors.push({
-        field: "Resolutions",
-        message: "Invalid Resolutions",
-      });
-    }
+
     for (const resolution of data.availableResolutions) {
       if (!existingResolutions.includes(resolution)) {
         errors.push({
