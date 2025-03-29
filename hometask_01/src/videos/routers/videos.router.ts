@@ -8,7 +8,6 @@ import { videoUpdateValidation } from "../validation/videoUpdateValidation";
 import { createErrorMessages } from "../../core/utils/error.utils";
 
 import { Videos, Resolutions, Video } from "../types/videos";
-import { testingRouter } from "../../testing/routers/testing.router";
 
 export const videosRouter = Router({});
 
