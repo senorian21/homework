@@ -69,17 +69,17 @@ export const videoUpdateValidation = (
   }
 
   if (
-      typeof data.publicationDate !== "string" ||
-      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(data.publicationDate) || // Регулярное выражение для проверки ISO 8601
-      isNaN(Date.parse(data.publicationDate))
+    typeof data.publicationDate !== "string" ||
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(
+      data.publicationDate,
+    ) || // Регулярное выражение для проверки ISO 8601
+    isNaN(Date.parse(data.publicationDate))
   ) {
     errors.push({
       field: "publicationDate",
       message: "Invalid publicationDate",
     });
   }
-
-
 
   return errors;
 };
